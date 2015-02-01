@@ -10,7 +10,7 @@ def strip_non_ascii(string):
 client = pymongo.MongoClient()
 db = client.crunchbase
 
-for x in range(315, 318):
+for x in range(0,1):
   r = requests.get('https://api.crunchbase.com/v/2/organizations?user_key=4c8d0795c93056f45eb38d1a16ddd71f&page=%s'%x)
   #print strip_non_ascii(r.text)
   data = json.loads(r.text)
