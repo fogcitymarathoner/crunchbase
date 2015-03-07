@@ -15,9 +15,15 @@ for company in db.crunchbase.find()[0:2400]:
     r = requests.get(link)
     returned_json = r.text
     print returned_json
-    if returned_json.find('API Authorization / Rate Limit Error') > -1:
-        response = json.loads(returned_json)
-
+    print type(returned_json)
+    print returned_json.find('Rate Limit Error')
+    if returned_json.find('Rate Limit Error') == -1:
+        try:
+            response = json.loads(returned_json)
+        except ValueError:
+            continue
+        if 'response' in response['data']:
+            continue
         data =  response['data']
         #print data
         if 'response' in data:
