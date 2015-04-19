@@ -1,0 +1,18 @@
+<html>
+    <body>
+        ${count} Companies Available
+        <form action="" method="post">
+            Part of Company Name: <input  name="q"  value="${q}"/> <br/>
+            <input type="submit" />
+        </form>
+        <?py if results_count > 0: ?>
+            <table>
+                <th>Name</th>
+
+                <?py for c in results: ?>
+                    <tr><td ><a href="show/?q=#{ c['name'] }">${ c['name'] }</a></td></tr>
+                <?py #endfor ?>
+            </table>
+        <?py #endif ?>
+    </body>
+</html>

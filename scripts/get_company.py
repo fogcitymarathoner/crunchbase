@@ -3,13 +3,17 @@ import requests
 import pymongo
 import json
 import sys
-client = pymongo.MongoClient()
-db = client.crunchbase
 
-#first = db.crunchbase.find_one()
+import sched, time
+"""
+API Rate Limits
 
-#link = 'https://api.crunchbase.com/v/2/%s?user_key=4c8d0795c93056f45eb38d1a16ddd71f'%(first['path'])
-for company in db.crunchbase.find()[0:2400]:
+We limit usage to 50 calls per minute, 2,500 calls per day and a total lifetime limit of 25k.
+To increase your rate limit, just email us at licensing@crunchbase.com.
+Technical questions and suggestions should be sent to api@crunchbase.com.
+"""
+def fetch_update_company(company, db):
+
     link = 'https://api.crunchbase.com/v/2/%s?user_key=4c8d0795c93056f45eb38d1a16ddd71f'%(company['path'])
     print link
     r = requests.get(link)
@@ -21,12 +25,13 @@ for company in db.crunchbase.find()[0:2400]:
         try:
             response = json.loads(returned_json)
         except ValueError:
-            continue
+            pass
         if 'response' in response['data']:
-            continue
+            pass
         data =  response['data']
         #print data
         if 'response' in data:
+            print data['error']['code']
             print 'bad co'
             #db.crunchbase.remove(company)
         else:
@@ -84,3 +89,21 @@ for company in db.crunchbase.find()[0:2400]:
             )[0]
     else:
         print 'daily call limit exceeded'
+
+
+s = sched.scheduler(time.time, time.sleep)
+
+client = pymongo.MongoClient()
+db = client.crunchbase
+
+i = 1
+for company in db.crunchbase.find({ "synced" : { "$exists" : False } } )[0:2400]:
+
+
+    print time.time()
+    s.enter(5*i, 1, fetch_update_company, (company, db))
+    s.run()
+    i += 1
+    print time.time()
+
+print 'done!'

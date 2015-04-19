@@ -1,0 +1,15 @@
+
+<html>
+    <body>
+
+        ${count} Companies Available
+        <form action="/crunchbase_search/" method="post">
+            Part of Company Name: <input  name="q"  value="${q}"/> <br/>
+            <input type="submit" />
+        </form>
+        <pre><code>
+            #{company_info}
+        </code></pre>
+
+    </body>
+</html>
