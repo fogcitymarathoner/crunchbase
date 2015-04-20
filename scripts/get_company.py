@@ -13,14 +13,23 @@ To increase your rate limit, just email us at licensing@crunchbase.com.
 Technical questions and suggestions should be sent to api@crunchbase.com.
 """
 def fetch_update_company(company, db):
-
+    print 'Company %s'%company['name']
     link = 'https://api.crunchbase.com/v/2/%s?user_key=4c8d0795c93056f45eb38d1a16ddd71f'%(company['path'])
     print link
     r = requests.get(link)
     returned_json = r.text
     print returned_json
-    print type(returned_json)
-    print returned_json.find('Rate Limit Error')
+    response = json.loads(returned_json)
+    if 'error' in response['data']:
+        if response['data']['error']['message'] == "Organization not found":
+            print 'Removing Company %s'%company['name']
+            db.crunchbase.remove( {"_id": company['_id']})
+            return
+        if response['data']['error']['message'].find('not found') != -1:
+            print 'Removing Company %s'%company['name']
+            db.crunchbase.remove( {"_id": company['_id']})
+            return
+
     if returned_json.find('Rate Limit Error') == -1:
         try:
             response = json.loads(returned_json)
