@@ -8,11 +8,17 @@
             <input type="submit" />
         </form>
         <ul>
-            ${company_info['data']['properties']['homepage_url']}
-            ${company_info['data']['properties']['name']}
-            <li><a href="${company_info['data']['properties']['homepage_url']}">${company_info['data']['properties']['name']}</a></li>
-            <li>${company_info['data']['relationships']['categories']['items'][0]['name']}</li>
-            <li><img src="https://res.cloudinary.com/crunchbase-production/${company_info['data']['relationships']['primary_image']['items'][0]['path']}"/></li>
+            <?py if 'homepage_url' in company_info['data']['properties']: ?>
+                <li><a href="${company_info['data']['properties']['homepage_url']}">${company_info['data']['properties']['name']}</a></li>
+            <?py else:?>
+                ${company_info['data']['properties']['name']}
+            <?py #endif ?>
+            <?py if 'categories' in company_info['data']['relationships']: ?>
+                <li>${company_info['data']['relationships']['categories']['items'][0]['name']}</li>
+            <?py #endif ?>
+            <?py if 'primary_image' in company_info['data']['relationships']: ?>
+                <li><img src="https://res.cloudinary.com/crunchbase-production/${company_info['data']['relationships']['primary_image']['items'][0]['path']}"/></li>
+            <?py #endif ?>
         </ul>
         <pre><code>
             #{company_info_pp}

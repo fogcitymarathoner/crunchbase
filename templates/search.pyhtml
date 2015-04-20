@@ -1,3 +1,4 @@
+<?py import urllib?>
 <html>
     <body>
         ${count} Companies Available
@@ -10,7 +11,9 @@
                 <th>Name</th>
 
                 <?py for c in results: ?>
-                    <tr><td ><a href="show/?q=#{ c['name'] }">${ c['name'] }</a></td></tr>
+
+                    <?py encoded_name = urllib.urlencode({'q': c['name']})?>
+                    <tr><td ><a href="show/?#{encoded_name }">${ c['name'] }</a></td></tr>
                 <?py #endfor ?>
             </table>
         <?py #endif ?>
