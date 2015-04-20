@@ -7,8 +7,15 @@
             Part of Company Name: <input  name="q"  value="${q}"/> <br/>
             <input type="submit" />
         </form>
+        <ul>
+            ${company_info['data']['properties']['homepage_url']}
+            ${company_info['data']['properties']['name']}
+            <li><a href="${company_info['data']['properties']['homepage_url']}">${company_info['data']['properties']['name']}</a></li>
+            <li>${company_info['data']['relationships']['categories']['items'][0]['name']}</li>
+            <li><img src="https://res.cloudinary.com/crunchbase-production/${company_info['data']['relationships']['primary_image']['items'][0]['path']}"/></li>
+        </ul>
         <pre><code>
-            #{company_info}
+            #{company_info_pp}
         </code></pre>
 
     </body>

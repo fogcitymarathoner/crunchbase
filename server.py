@@ -63,7 +63,8 @@ class Root(object):
             r = requests.get(url)
             company_info = json.loads(r.text)
             context = {
-                'company_info': json.dumps(company_info, sort_keys=True, indent=4, separators=(',', ': ')),
+                'company_info': company_info,
+                'company_info_pp': json.dumps(company_info, sort_keys=True, indent=4, separators=(',', ': ')),
                 'count': db.crunchbase.count(),
                 'q': q
             }
