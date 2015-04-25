@@ -14,12 +14,9 @@ import logging
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from settings import CRUNCHBASE_KEY
-"""
-get_companies.py - pulls down first 400 pages of organizations, stores them in mongo db
-"""
+
 def get_page_record_page(x, db):
     """
-
     scheduled (deferred) task that pulls down summary page number x
     and records data into database
     :param x:

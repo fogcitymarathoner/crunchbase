@@ -1,0 +1,15 @@
+<?py ?>
+<html>
+    <body>
+
+        <?py if synced_count > 0: ?>
+            <table>
+                <th>Name</th>
+                <?py for c in synced: ?>
+
+                    <tr><td ><a href="show/?#{c['encoded_name'] }">${ c['name'] }</a></td></tr>
+                <?py #endfor ?>
+            </table>
+        <?py #endif ?>
+    </body>
+</html>

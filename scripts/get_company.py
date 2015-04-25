@@ -13,6 +13,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from settings import CRUNCHBASE_KEY
 
 """
+get_company.py - loops through company gotten with get_companies.py that have not been mined for
+details
+
 API Rate Limits
 
 We limit usage to 50 calls per minute, 2,500 calls per day and a total lifetime limit of 25k.

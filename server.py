@@ -9,10 +9,23 @@ import re
 import pymongo
 
 import requests
+import urllib
+from settings import PAGE_SIZE
 client = pymongo.MongoClient()
 db = client.crunchbase
 engine = tenjin.Engine(path=['templates'])
 
+def scrub_name(synced):
+    synced_scrubbed = []
+    for s in synced:
+
+        try:
+            encoded_name = urllib.urlencode({'q': s['name']})
+        except:
+            encoded_name = 'NON ASCII'
+        s['encoded_name'] = encoded_name
+        synced_scrubbed.append(s)
+    return synced_scrubbed
 class Root(object):
 
     @cherrypy.expose
@@ -78,6 +91,34 @@ class Root(object):
 
         return html
 
+    @cherrypy.expose
+    def synced(self, page=0):
+
+        synced_count = db.crunchbase.find({ "synced" : { "$exists" : True } } ).count()
+        synced = db.crunchbase.find({ "synced" : { "$exists" : True } } )
+
+        context = {
+            'synced_count': synced_count,
+            'synced': scrub_name(synced)[page*PAGE_SIZE, page*PAGE_SIZE+PAGE_SIZE]
+        }
+        ## render template with context data
+        html = engine.render('synced.pyhtml', context)
+
+        return html
+
+    @cherrypy.expose
+    def unsynced(self, page=0):
+
+        unsynced_count = db.crunchbase.find({ "synced" : { "$exists" : False } } ).count()
+        unsynced = db.crunchbase.find({ "synced" : { "$exists" : False } } )
+        context = {
+            'unsynced_count': unsynced_count,
+            'unsynced': scrub_name(unsynced)[page*PAGE_SIZE, page*PAGE_SIZE+PAGE_SIZE]
+        }
+        ## render template with context data
+        html = engine.render('unsynced.pyhtml', context)
+
+        return html
 if __name__ == '__main__':
 
     cherrypy.config.update({
