@@ -17,38 +17,42 @@ class Root(object):
 
     @cherrypy.expose
     def index(self, q=None):
-        """Simplest possible HTML file upload form. Note that the encoding
-        type must be multipart/form-data."""
-
+        """
+        Show search form with basic measurements like unsynced count and overall count
+        """
+        count = db.crunchbase.count()
+        unsynced_count = db.crunchbase.find({ "synced" : { "$exists" : False } } ).count()
         if q is None or q == '':
             context = {
                 'results': [],
-                'count': db.crunchbase.count(),
+                'count': count,
+                'unsynced_count': unsynced_count,
                 'q': q,
                 'results_count': 0
             }
         else:
-
             res = db.crunchbase.find({"name": {'$regex':'%s'%q}})
-
             context = {
                 'results': res,
-                'count': db.crunchbase.count(),
+                'count': count,
+                'unsynced_count': unsynced_count,
                 'q': q,
                 'results_count': res.count()
             }
         ## render template with context data
         html = engine.render('search.pyhtml', context)
-
         return html
 
     @cherrypy.expose
     def show(self, q=None):
 
+        unsynced_count = db.crunchbase.find({ "synced" : { "$exists" : False } } ).count()
+        count = db.crunchbase.count()
         if q is None or q == '':
             context = {
                 'results': [],
-                'count': db.crunchbase.count(),
+                'count': count,
+                'unsynced_count': unsynced_count,
                 'q': q
             }
             ## render template with context data
@@ -65,7 +69,8 @@ class Root(object):
             context = {
                 'company_info': company_info,
                 'company_info_pp': json.dumps(company_info, sort_keys=True, indent=4, separators=(',', ': ')),
-                'count': db.crunchbase.count(),
+                'count': count,
+                'unsynced_count': unsynced_count,
                 'q': q
             }
         ## render template with context data

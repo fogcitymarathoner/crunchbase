@@ -1,7 +1,10 @@
 <?py import urllib?>
 <html>
     <body>
-        ${count} Companies Available
+        <ul>
+            <li>${count} Companies Available</li>
+            <li>${unsynced_count} Unsynced Companies Available</li>
+        </ul>
         <form action="" method="post">
             Part of Company Name: <input  name="q"  value="${q}"/> <br/>
             <input type="submit" />

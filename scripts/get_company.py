@@ -5,6 +5,13 @@ import json
 import sys
 
 import sched, time
+import os
+
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from settings import CRUNCHBASE_KEY
+
 """
 API Rate Limits
 
@@ -14,7 +21,7 @@ Technical questions and suggestions should be sent to api@crunchbase.com.
 """
 def fetch_update_company(company, db):
     print 'Company %s'%company['name']
-    link = 'https://api.crunchbase.com/v/2/%s?user_key=4c8d0795c93056f45eb38d1a16ddd71f'%(company['path'])
+    link = 'https://api.crunchbase.com/v/2/%s?user_key=%s'%(company['path'], CRUNCHBASE_KEY)
     print link
     r = requests.get(link)
     returned_json = r.text

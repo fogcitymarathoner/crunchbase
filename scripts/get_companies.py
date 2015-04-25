@@ -11,7 +11,9 @@ from datetime import datetime as dt
 import datetime
 import logging
 
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
+from settings import CRUNCHBASE_KEY
 
 def get_page_record_page(x, db):
     """
@@ -20,7 +22,7 @@ def get_page_record_page(x, db):
     :param x:
     :return:
     """
-    r = requests.get('https://api.crunchbase.com/v/2/organizations?user_key=4c8d0795c93056f45eb38d1a16ddd71f&page=%s'%x)
+    r = requests.get('https://api.crunchbase.com/v/2/organizations?user_key=%s&page=%s'%(CRUNCHBASE_KEY, x))
 
     data = json.loads(r.text)
 
