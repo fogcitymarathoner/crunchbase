@@ -1,0 +1,9 @@
+<ul>
+    <li>${count} Companies Available</li>
+    <li><a href="synced/">${synced_count} Synced Companies Available</a></li>
+    <li><a href="unsynced/">${unsynced_count} Unsynced Companies Available</a></li>
+</ul>
+<form action="" method="post">
+    Part of Company Name: <input  name="q"  value="${q}"/> <br/>
+    <input type="submit" />
+</form>

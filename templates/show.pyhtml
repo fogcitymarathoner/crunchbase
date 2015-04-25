@@ -1,24 +1,23 @@
 <html>
     <body>
+
+        <?py include('_header.pyhtml', count=count, unsynced_count=unsynced_count, synced_count=synced_count) ?>
+
         <ul>
-            <li>${count} Companies Available</li>
-            <li>${unsynced_count} Unsynced Companies Available</li>
-        </ul>
-        <form action="/crunchbase_search/" method="post">
-            Part of Company Name: <input  name="q"  value="${q}"/> <br/>
-            <input type="submit" />
-        </form>
-        <ul>
-            <?py if 'homepage_url' in company_info['data']['properties']: ?>
-                <li><a href="${company_info['data']['properties']['homepage_url']}">${company_info['data']['properties']['name']}</a></li>
-            <?py else:?>
-                ${company_info['data']['properties']['name']}
+            <?py if 'properties' in company_info['data']: ?>
+                <?py if 'homepage_url' in company_info['data']['properties']: ?>
+                    <li><a href="${company_info['data']['properties']['homepage_url']}">${company_info['data']['properties']['name']}</a></li>
+                <?py else:?>
+                    ${company_info['data']['properties']['name']}
+                <?py #endif ?>
             <?py #endif ?>
-            <?py if 'categories' in company_info['data']['relationships']: ?>
-                <li>${company_info['data']['relationships']['categories']['items'][0]['name']}</li>
-            <?py #endif ?>
-            <?py if 'primary_image' in company_info['data']['relationships']: ?>
-                <li><img src="https://res.cloudinary.com/crunchbase-production/${company_info['data']['relationships']['primary_image']['items'][0]['path']}"/></li>
+            <?py if 'relationships' in company_info['data']: ?>
+                <?py if 'categories' in company_info['data']['relationships']: ?>
+                    <li>${company_info['data']['relationships']['categories']['items'][0]['name']}</li>
+                <?py #endif ?>
+                <?py if 'primary_image' in company_info['data']['relationships']: ?>
+                    <li><img src="https://res.cloudinary.com/crunchbase-production/${company_info['data']['relationships']['primary_image']['items'][0]['path']}"/></li>
+                <?py #endif ?>
             <?py #endif ?>
         </ul>
         <pre><code>

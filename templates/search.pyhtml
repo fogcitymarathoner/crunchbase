@@ -1,14 +1,8 @@
 <?py import urllib?>
 <html>
     <body>
-        <ul>
-            <li>${count} Companies Available</li>
-            <li>${unsynced_count} Unsynced Companies Available</li>
-        </ul>
-        <form action="" method="post">
-            Part of Company Name: <input  name="q"  value="${q}"/> <br/>
-            <input type="submit" />
-        </form>
+        <?py include('_header.pyhtml', count=count, unsynced_count=unsynced_count, synced_count=synced_count) ?>
+
         <?py if results_count > 0: ?>
             <table>
                 <th>Name</th>
