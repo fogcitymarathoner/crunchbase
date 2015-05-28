@@ -1,5 +1,13 @@
 __author__ = 'marc'
 
 
-CRUNCHBASE_KEY = '4c8d0795c93056f45eb38d1a16ddd71f'
 PAGE_SIZE = 50
+
+########################################################################
+# import local environment settings
+
+try:
+    from local_settings import *
+except ImportError:
+    pass
+
