@@ -1,0 +1,6 @@
+
+<form action="/crunchbase_search/" method="post">
+    Part of Company Name: <input  name="q"  value="${q}"/> <br/>
+    <input type="submit" value="SEARCH"></input>
+    <input type="submit" value="RESET" name="reset_btn"></input>
+</form>

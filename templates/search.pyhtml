@@ -1,18 +1,39 @@
 <?py import urllib?>
 <html>
-    <body>
-        <?py include('_header.pyhtml', count=count, unsynced_count=unsynced_count, synced_count=synced_count) ?>
+    <head>
+        <?py include('common_head.pyhtml') ?>
+    </head>
+    <body class="container">
+        <div class="jumbotron">
+            <div class="container">
+                <?py include('_header.pyhtml', count=count, unsynced_count=unsynced_count, synced_count=synced_count) ?>
+            </div>
+        </div>
 
-        <?py if results_count > 0: ?>
-            <table>
-                <th>Name</th>
 
-                <?py for c in results: ?>
-
-                    <?py encoded_name = urllib.urlencode({'q': c['name']})?>
-                    <tr><td ><a href="show/?#{encoded_name }">${ c['name'] }</a></td></tr>
-                <?py #endfor ?>
-            </table>
-        <?py #endif ?>
+    <div class="container">
+        <!-- Search form -->
+        <div class="row">
+            <div class="col-12"><?py include('_search_form.pyhtml', q=q) ?></div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <!-- If just one result show details -->
+                    <?py if results_count == 1: ?>
+                        <?py include('_details.pyhtml', c=results['data']['items'][0]) ?>
+                    <?py #endif ?>
+                <!-- Otherwise proceed to drill down with show controller -->
+                <?py if results_count > 1: ?>
+                    <table>
+                        <th>Name</th>
+                        <?py for c in results['data']['items']: ?>
+                            <tr><td ><a href="/crunchbase_search/show/?name=${ c['properties']['name'] }">${ c['properties']['name'] }</a></td></tr>
+                        <?py #endfor ?>
+                    </table>
+                <?py #endif ?>
+            </div>
+        </div>
     </body>
 </html>
+
+<script src="/crunchbase_search/static/js/search_app.js"></script>

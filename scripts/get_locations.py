@@ -22,19 +22,22 @@ def get_page_record_page(x, db):
     :param x:
     :return:
     """
-    r = requests.get('https://api.crunchbase.com/v/2/organizations?user_key=%s&page=%s'%(CRUNCHBASE_KEY, x))
+    r = requests.get('https://api.crunchbase.com/v/3/locations?user_key=%s&page=%s'%(CRUNCHBASE_KEY, x))
 
     data = json.loads(r.text)
 
     for y in data['data']['items']:
+        print y
         o = {
-          'name': y['name'],
-          'path': y['path'],
+          'name': y['properties']['name'],
+          'web_path': y['properties']['web_path'],
+          'parent_location_uuid': y['properties']['parent_location_uuid'],
+          'location_type': y['properties']['location_type'],
         }
-        db.crunchbase.update(o, o, True)
+        db.crunchbase_locations.update(o, o, True)
         sys.stdout.write('.')
         sys.stdout.flush()
-    if x < 400:
+    if x < 72:
 
         print time.time()
         new_date = dt.now() + datetime.timedelta(minutes=5)
@@ -67,7 +70,7 @@ def main():
     first_time = dt.combine(dt.now(), daily_time)
     # time, priority, callable, *args
 
-    scheduler.enterabs(time.mktime(t.timetuple()), 1, get_page_record_page, (1, db))
+    scheduler.enterabs(time.mktime(dt.now().timetuple()), 1, get_page_record_page, (1, db))
     scheduler.run()
 
 if __name__ == '__main__':

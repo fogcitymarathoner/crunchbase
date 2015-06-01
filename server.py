@@ -30,9 +30,9 @@ def scrub_name(synced, page):
 class Root(object):
 
     @cherrypy.expose
-    def index(self, q=None):
+    def index(self, q=None, reset_btn=None):
         """
-        Show search form with basic measurements like unsynced count and overall count
+        Show search form for fuzzy search
         """
         count = db.crunchbase.count()
         unsynced_count = db.crunchbase.find({ "synced" : { "$exists" : False } } ).count()
@@ -47,56 +47,71 @@ class Root(object):
                 'results_count': 0
             }
         else:
-            res = db.crunchbase.find({"name": {'$regex':'%s'%q}})
+            #res = db.crunchbase.find({"name": {'$regex':'%s'%q}})
+
+            link = 'https://api.crunchbase.com/v/3/organizations?query=*%s*&user_key=%s'%(q, CRUNCHBASE_KEY)
+            print link
+
+            r = requests.get(link)
+            returned_json = r.text
+            #print returned_json
+            results = json.loads(returned_json)
+            results_count = len(results['data']['items'])
             context = {
-                'results': res,
+                'results': results,
                 'count': count,
                 'unsynced_count': unsynced_count,
                 'synced_count': synced_count,
                 'q': q,
-                'results_count': res.count()
+                'results_count': results_count,
             }
         ## render template with context data
         html = engine.render('search.pyhtml', context)
         return html
 
     @cherrypy.expose
-    def show(self, q=None):
+    def show(self, name=None):
 
         unsynced_count = db.crunchbase.find({ "synced" : { "$exists" : False } } ).count()
         synced_count = db.crunchbase.find({ "synced" : { "$exists" : True } } ).count()
         count = db.crunchbase.count()
-        if q is None or q == '':
+        if name is None or name == '':
             context = {
                 'results': [],
                 'count': count,
                 'unsynced_count': unsynced_count,
                 'synced_count': synced_count,
-                'q': q
+                'q': name
             }
             ## render template with context data
             html = engine.render('search.pyhtml', context)
 
             return html
         else:
+            print 'Company %s'%name
+            link = 'https://api.crunchbase.com/v/3/organizations?name=%s&user_key=%s'%(name, CRUNCHBASE_KEY)
+            print link
+            r = requests.get(link)
+            returned_json = r.text
+            print returned_json
+            response = json.loads(returned_json)
+            if len(response['data']['items']) > 0:
+                """
+                show all found and ask for more selection
+                """
+                context = {
+                        'results': response,
+                        'count': count,
+                        'unsynced_count': unsynced_count,
+                        'synced_count': synced_count,
+                        'q': name,
+                        'results_count': len(response['data']['items'])
+                    }
+                ## render template with context data
+                html = engine.render('search.pyhtml', context)
+                return html
 
-            res = db.crunchbase.find({"name": {'$regex':'%s'%q}})
-            url = 'https://api.crunchbase.com/v/2/%s?user_key=%s'%(res[0]['path'], CRUNCHBASE_KEY)
-
-            r = requests.get(url)
-            company_info = json.loads(r.text)
-            context = {
-                'company_info': company_info,
-                'company_info_pp': json.dumps(company_info, sort_keys=True, indent=4, separators=(',', ': ')),
-                'count': count,
-                'unsynced_count': unsynced_count,
-                'synced_count': synced_count,
-                'q': q
-            }
-        ## render template with context data
-        html = engine.render('show.pyhtml', context)
-
-        return html
+        # Shouldn't be hit
 
     @cherrypy.expose
     def synced(self, page=0):
