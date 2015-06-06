@@ -1,59 +1,8 @@
 <dl>
-    <?py properties = c['properties'] ?>
-    <dt>Company Name</dt><dd>${properties['name']}</dd>
+    <?py properties = [] ?>
+    <dt>Title</dt><dd>${c['title']}</dd>
 
-    <?py if properties['profile_image_url'] != None: ?>
-          <dt>Pic</dt><dd><img src="${properties['profile_image_url']}"/></dd>
+    <?py if c['img_url'] != None: ?>
+          <dt>Pic</dt><dd><img src="${c['img_url']}"/></dd>
     <?py #endif ?>
-
-    <?py if properties['city_name'] != None: ?>
-		<dt>City</dt><dd>${properties['city_name']}</dd>
-    <?py #endif ?>
-
-    <?py if properties['region_name'] != None: ?>
-		<dt>Region Name</dt><dd>${properties['region_name']}</dd>
-    <?py #endif ?>
-
-    <?py if properties['country_code'] != None: ?>
-		<dt>Country Code</dt><dd>${properties['country_code']}</dd>
-    <?py #endif ?>
-
-    <?py if properties['primary_role'] != None: ?>
-		<dt>Primary Role</dt><dd>${properties['primary_role']}</dd>
-    <?py #endif ?>
-
-    <?py if properties['short_description'] != None: ?>
-		<dt>Short Description</dt><dd>${properties['short_description']}</dd>
-    <?py #endif ?>
-
-    <?py if properties['homepage_url'] != None: ?>
-		<dt>Home page</dt><dd><a href="${properties['homepage_url']}">${properties['homepage_url']}</a></dd>
-    <?py #endif ?>
-
-    <?py if properties['facebook_url'] != None: ?>
-		<dt>Facebook</dt>
-            <dd>
-                <a href="${properties['facebook_url']}">${properties['facebook_url']}</a>
-            </dd>
-    <?py #endif ?>
-
-    <?py if properties['linkedin_url'] != None: ?>
-		<dt>LinkedIn</dt><dd><a href="${properties['linkedin_url']}">${properties['linkedin_url']}</a></dd>
-    <?py #endif ?>
-
-    <?py if properties['twitter_url'] != None: ?>
-		<dt>Twitter</dt><dd><a href="${properties['twitter_url']}">${properties['twitter_url']}</a></dd>
-    <?py #endif ?>
-
-    <?py from datetime import datetime as dt ?>
-    <?py if properties['updated_at'] != None: ?>
-        <?py updated_str = dt.fromtimestamp(int(properties['updated_at'])).strftime('%Y-%m-%d %H:%M:%S') ?>
-		<dt>Updated At</dt><dd>${updated_str} UTC</dd>
-    <?py #endif ?>
-
-    <?py if properties['created_at'] != None: ?>
-        <?py created_str = dt.fromtimestamp(int(properties['created_at'])).strftime('%Y-%m-%d %H:%M:%S') ?>
-		<dt>Created At</dt><dd>${created_str} UTC</dd>
-    <?py #endif ?>
-
 </dl>

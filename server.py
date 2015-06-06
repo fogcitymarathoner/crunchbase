@@ -1,4 +1,12 @@
 author__ = 'marc'
+from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
+from selenium.webdriver.support import expected_conditions as EC # available since 2.26.0
+from selenium.webdriver.common.by import By
+
+# Create a new instance of the Firefox driver
+
 
 import cherrypy
 import tenjin
@@ -70,12 +78,12 @@ class Root(object):
         return html
 
     @cherrypy.expose
-    def show(self, name=None):
+    def show(self, permalink=None):
 
         unsynced_count = db.crunchbase.find({ "synced" : { "$exists" : False } } ).count()
         synced_count = db.crunchbase.find({ "synced" : { "$exists" : True } } ).count()
         count = db.crunchbase.count()
-        if name is None or name == '':
+        if permalink is None or permalink == '':
             context = {
                 'results': [],
                 'count': count,
@@ -88,30 +96,50 @@ class Root(object):
 
             return html
         else:
-            print 'Company %s'%name
-            link = 'https://api.crunchbase.com/v/3/organizations?name=%s&user_key=%s'%(name, CRUNCHBASE_KEY)
-            print link
-            r = requests.get(link)
-            returned_json = r.text
-            print returned_json
-            response = json.loads(returned_json)
-            if len(response['data']['items']) > 0:
-                """
-                show all found and ask for more selection
-                """
-                context = {
-                        'results': response,
-                        'count': count,
-                        'unsynced_count': unsynced_count,
-                        'synced_count': synced_count,
-                        'q': name,
-                        'results_count': len(response['data']['items'])
-                    }
-                ## render template with context data
-                html = engine.render('search.pyhtml', context)
-                return html
+            print 'Permalink %s'%permalink
+            """
+            link = 'https://api.crunchbase.com/v/3/organizations/:%s?user_key=%s'%(urllib.quote_plus(permalink),
+                                                                                   CRUNCHBASE_KEY)
+                                                                                   """
+            driver = webdriver.Firefox()
+            link = 'https://www.crunchbase.com/organization/%s'%(urllib.quote_plus(permalink))
 
-        # Shouldn't be hit
+            print link
+            #r = requests.get(link)
+
+            # go to the google home page
+            driver.get(link)
+            try:
+                element = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.ID, "profile_header_heading"))
+                )
+            except TimeoutException:
+                return '<h1>That Company does not have a proper CrunchBase profile</h1>'
+            finally:
+                pass
+            # the page is ajaxy so the title is originally this:
+            print driver.title
+            imgs = driver.find_elements_by_class_name('entity-info-card-primary-image')
+            img_url = imgs[0].get_attribute("src")
+            results = {
+                'img_url': img_url,
+                'title': driver.title,
+            }
+
+            count = 1
+            results_count = 1
+            context = {
+                'img_src': img_url,
+                'results': results,
+                'count': count,
+                'unsynced_count': unsynced_count,
+                'synced_count': synced_count,
+                'q': permalink,
+                'results_count': results_count,
+            }
+        ## render template with context data
+        html = engine.render('search.pyhtml', context)
+        return html
 
     @cherrypy.expose
     def synced(self, page=0):
