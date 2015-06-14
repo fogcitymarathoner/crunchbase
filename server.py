@@ -4,9 +4,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
 from selenium.webdriver.support import expected_conditions as EC # available since 2.26.0
 from selenium.webdriver.common.by import By
-
-# Create a new instance of the Firefox driver
-
+from bs4 import BeautifulSoup as bs
 
 import cherrypy
 import tenjin
@@ -78,23 +76,26 @@ class Root(object):
         return html
 
     @cherrypy.expose
-    def show(self, permalink=None):
+    def show(self, permalink=None, format='html'):
 
-        unsynced_count = db.crunchbase.find({ "synced" : { "$exists" : False } } ).count()
-        synced_count = db.crunchbase.find({ "synced" : { "$exists" : True } } ).count()
-        count = db.crunchbase.count()
+        #unsynced_count = db.crunchbase.find({ "synced" : { "$exists" : False } } ).count()
+        #synced_count = db.crunchbase.find({ "synced" : { "$exists" : True } } ).count()
+        #count = db.crunchbase.count()
         if permalink is None or permalink == '':
             context = {
                 'results': [],
-                'count': count,
-                'unsynced_count': unsynced_count,
-                'synced_count': synced_count,
+                #'count': count,
+                #'unsynced_count': unsynced_count,
+                #'synced_count': synced_count,
                 'q': name
             }
             ## render template with context data
-            html = engine.render('search.pyhtml', context)
-
-            return html
+            if format == 'html':
+                html = engine.render('search.pyhtml', context)
+                return html
+            else:
+                json = json.dumps({'error': 1, 'message': 'You did not specify a permalink'})
+                return json
         else:
             print 'Permalink %s'%permalink
             """
@@ -104,13 +105,27 @@ class Root(object):
             driver = webdriver.Firefox()
             link = 'https://www.crunchbase.com/organization/%s'%(urllib.quote_plus(permalink))
 
-            print link
+            print ('###################################################################')
+            print ('###################################################################')
+            print ('###################################################################')
+            print ('###################################################################')
+            print ('###################################################################')
+            print ('###################################################################')
+            print (link)
+
+            print ('###################################################################')
+            print ('###################################################################')
+            print ('###################################################################')
+            print ('###################################################################')
+            print ('###################################################################')
+            print ('###################################################################')
             #r = requests.get(link)
 
             # go to the google home page
             driver.get(link)
+            print driver.page_source
             try:
-                element = WebDriverWait(driver, 10).until(
+                element = WebDriverWait(driver, 60).until(
                     EC.presence_of_element_located((By.ID, "profile_header_heading"))
                 )
             except TimeoutException:
@@ -119,28 +134,67 @@ class Root(object):
                 pass
             # the page is ajaxy so the title is originally this:
             print driver.title
+            print driver.page_source
+            doc = bs(driver.page_source)
+            dic_div = doc.find('div', { "class" : "definition-list container" })
+
+            dic_item = dic_div.find('dt', text='Headquarters:')
+            desc_item = dic_div.find('dt', text='Descripton:')
+            cat_item = dic_div.find('dt', text='Categories:')
+            website_item = dic_div.find('dt', text='Website:')
+            if dic_item:
+                location = dic_item.find_next_sibling('dd').text
+            else:
+                location = ''
+            if desc_item:
+                description = desc_item.find_next_sibling('dd').text
+            else:
+                description = ''
+            if cat_item:
+                categories = cat_item.find_next_sibling('dd').text
+            else:
+                categories = ''
+            if website_item:
+                website = website_item.find_next_sibling('dd').text
+            else:
+                website = ''
             imgs = driver.find_elements_by_class_name('entity-info-card-primary-image')
-            img_url = imgs[0].get_attribute("src")
+            if imgs[0]:
+                img_url = imgs[0].get_attribute("src")
+            else:
+                image_url = ''
             results = {
                 'img_url': img_url,
                 'title': driver.title,
+                'location': location,
+                'description': description,
+                'categories': categories,
+                'website': website,
             }
 
-            count = 1
+            #count = 1
+            #
+            # keeps details render from choking
+            #
             results_count = 1
             context = {
                 'img_src': img_url,
                 'results': results,
-                'count': count,
-                'unsynced_count': unsynced_count,
-                'synced_count': synced_count,
+                #'count': count,
+                #'unsynced_count': unsynced_count,
+                #'synced_count': synced_count,
                 'q': permalink,
                 'results_count': results_count,
             }
+        driver.quit()
         ## render template with context data
-        html = engine.render('search.pyhtml', context)
-        return html
-
+        if format == 'html':
+            html = engine.render('search.pyhtml', context)
+            return html
+        else:
+            import json #????
+            json_context = json.dumps(context)
+            return json_context
     @cherrypy.expose
     def synced(self, page=0):
 

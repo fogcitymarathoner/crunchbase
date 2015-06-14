@@ -6,7 +6,7 @@
     <body class="container">
         <div class="jumbotron">
             <div class="container">
-                <?py include('_header.pyhtml', count=count, unsynced_count=unsynced_count, synced_count=synced_count) ?>
+                <?py #include('_header.pyhtml', count=count, unsynced_count=unsynced_count, synced_count=synced_count) ?>
             </div>
         </div>
 

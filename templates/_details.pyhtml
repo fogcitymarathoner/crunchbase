@@ -5,4 +5,16 @@
     <?py if c['img_url'] != None: ?>
           <dt>Pic</dt><dd><img src="${c['img_url']}"/></dd>
     <?py #endif ?>
+    <?py if c['location'] != None: ?>
+          <dt>Location</dt><dd>${c['location']}</dd>
+    <?py #endif ?>
+    <?py if c['description'] != None: ?>
+          <dt>Location</dt><dd>${c['location']}</dd>
+    <?py #endif ?>
+    <?py if c['categories'] != None: ?>
+          <dt>Categories</dt><dd>${c['categories']}</dd>
+    <?py #endif ?>
+    <?py if c['website'] != None: ?>
+          <dt>Website</dt><dd>${c['website']}</dd>
+    <?py #endif ?>
 </dl>
